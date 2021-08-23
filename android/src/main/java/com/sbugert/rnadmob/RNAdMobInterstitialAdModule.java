@@ -18,6 +18,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,6 +135,11 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                     promise.reject("E_AD_ALREADY_LOADED", "Ad is already loaded.");
                 } else {
                     mRequestAdPromise = promise;
+                    RequestConfiguration.Builder configurationBuilder = MobileAds.getRequestConfiguration().toBuilder();
+                    configurationBuilder.setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE);
+                    configurationBuilder.setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE);
+                    configurationBuilder.setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G);
+                    MobileAds.setRequestConfiguration(configurationBuilder.build());
                     AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
                     if (testDevices != null) {
                         for (int i = 0; i < testDevices.length; i++) {
@@ -143,7 +150,6 @@ public class RNAdMobInterstitialAdModule extends ReactContextBaseJavaModule {
                             adRequestBuilder.addTestDevice(testDevice);
                         }
                     }
-                    adRequestBuilder.tagForChildDirectedTreatment(true);
                     AdRequest adRequest = adRequestBuilder.build();
                     mInterstitialAd.loadAd(adRequest);
                 }
